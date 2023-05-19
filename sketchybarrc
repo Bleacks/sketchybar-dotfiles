@@ -13,6 +13,8 @@ PLUGIN_DIR="$CONFIG_DIR/plugins" # Directory where all the plugin scripts are st
 FONT="MesloLGS NF" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
 PADDINGS=1 # All paddings use this value (icon, label, background)
 
+ENABLE_FORK_LOADING=true
+
 # Setting up and starting the helper process
 HELPER=git.felix.helper
 killall helper
@@ -124,9 +126,9 @@ source "$DYNAMIC_ISLAND_DIR/item.sh" # Loads Dynamic-Island item
 #
 
 YABAI_PLUGIN_DIR="$PLUGIN_DIR/yabai"
+
 source "$ITEM_DIR/yabai.sh"
 source "$ITEM_DIR/front_app.sh"
-
 
 #
 # </Yabai>

@@ -69,7 +69,7 @@ do
     sketchybar  --add item "$SPACE_ITEM_NAME-splitter" left "${space_splitter_base[@]}"
     
     SPACE_ID=$(echo "$SPACE" | jq '.id')
-    refresh_space "$SPACE_ID"
+    refresh_space "$SPACE_ID" &
   done
 done <<< "$CURRENT_SPACES"
 
