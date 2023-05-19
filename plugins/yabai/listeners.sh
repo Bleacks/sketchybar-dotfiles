@@ -29,6 +29,7 @@ window_destroyed() {
 space_changed() {
   CURRENT_SPACE_ID="$1"
   RECENT_SPACE_ID="$2"
+
   refresh_space "$CURRENT_SPACE_ID"
   refresh_space "$RECENT_SPACE_ID"
 }

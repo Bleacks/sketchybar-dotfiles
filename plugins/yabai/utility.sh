@@ -21,7 +21,8 @@ create_window() {
     ICON_NAME=$($CONFIG_DIR/plugins/icon_map.sh "$APP")
   fi
     
-  sketchybar  --add item "$ITEM_NAME" left                  \
+  sketchybar  --animate sin 5                               \
+              --add item "$ITEM_NAME" left                  \
               --set "$ITEM_NAME"  "${window_icon_base[@]}"  \
                                   icon="$ICON_NAME"         \
                                   icon.color=$WINDOW_DEFAULT_COLOR
@@ -39,23 +40,33 @@ destroy_window() {
 
 refresh_space() {
   SPACE_ID="$1"
-  # SPACE=$(yabai -m query --spaces | jq --arg FILTER "$SPACE_ID" '. | map(select(.id == $FILTER))')
-  SPACE=$(yabai -m query --spaces --space "$SPACE_ID")
+  SPACE_INDEX=$(yabai -m query --spaces | jq --arg FILTER "$SPACE_ID" '.[] | select(.["id"] == ($FILTER | tonumber)) | .index')
+  SPACE=$(yabai -m query --spaces --space "$SPACE_INDEX")
+
   SPACE_HAS_FOCUS=$(echo "$SPACE" | jq '."has-focus"')
   SPACE_IS_FULLSCREEN=$(echo "$SPACE" | jq '."is-native-fullscreen"')
 
-  COLOR=$SPACE_BORDER_DEFAULT
-  if [ "$SPACE_IS_FULLSCREEN" = "true" ]; then
-    COLOR=$SPACE_BORDER_FULLSCREEN
+  BORDER_COLOR=$SPACE_BORDER_DEFAULT
+  BACKGROUND_COLOR=$SPACE_BACKGROUD_DEFAULT
+  LABEL_COLOR=$WINDOW_DEFAULT_COLOR
+  if [ "$SPACE_IS_FULLSCREEN" = "true" ]
+  then
+    BORDER_COLOR=$SPACE_BORDER_FULLSCREEN
     BACKGROUND_COLOR=$SPACE_BACKGROUND_FULLSCREEN
-    sketchybar --animate sin 10 --set "yabai-space-${SPACE_ID}" label.highlight=on # TODO: Implement color shifting through highlight
-    WINDOW_ID=$(yabai -m query --windows --space "$SPACE_ID" | jq '.[].id')
-    sketchybar --animate sin 10 --set "yabai-space-${SPACE_ID}-${WINDOW_ID}" icon.highlight=on
+    LABEL_COLOR=$WINDOW_FULLSCREEN_COLOR
+    # TODO: Implement color shifting through highlight
+    WINDOW_ID=$(yabai -m query --windows --space "$SPACE_INDEX" | jq '.[].id')
 
-  elif [ "$SPACE_HAS_FOCUS" = "true" ]; then
-    COLOR=$SPACE_BORDER_FOCUSED
+  elif [ "$SPACE_HAS_FOCUS" = "true" ]
+  then
+    BORDER_COLOR=$SPACE_BORDER_FOCUSED
   fi
-  # echo $SPACE_ID $SPACE_HAS_FOCUS $SPACE_IS_FULLSCREEN $COLOR
 
-  sketchybar --animate sin 10 --set "yabai-space-${SPACE_ID}-bracket" background.border_color="$COLOR" background.color="$BACKGROUND_COLOR"
+  sketchybar  --animate sin 10 \
+              --set "yabai-space-${SPACE_INDEX}-bracket" \
+                    background.border_color="$BORDER_COLOR" \
+                    background.color="$BACKGROUND_COLOR" \
+                    label.color="$LABEL_COLOR" \
+              --set "yabai-space-${SPACE_INDEX}-id" \
+                    label.color="$LABEL_COLOR"
 }
