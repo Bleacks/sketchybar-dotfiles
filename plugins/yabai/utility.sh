@@ -4,6 +4,39 @@ source "$CONFIG_DIR/plugins/yabai/styles.sh"
 # Utility functions
 #
 
+refresh_window() {
+  source "$CONFIG_DIR/colors.sh"
+  WINDOW_ID="$1"
+
+  WINDOW=$(yabai -m query --windows --window "$WINDOW_ID")
+  WINDOW_HAS_FOCUS=$(echo "$WINDOW" | jq '."has-focus"')
+  WINDOW_IS_FULLSCREEN=$(echo "$WINDOW" | jq '."is-native-fullscreen"')
+  WINDOW_IS_MINIMIZED=$(echo "$WINDOW" | jq '."is-minimized"')
+  WINDOW_IS_HIDDEN=$(echo "$WINDOW" | jq '."is-hidden"')
+  SPACE_ID=$(echo "$WINDOW" | jq '."space"')
+
+  COLOR=$WINDOW_DEFAULT_COLOR
+  if [ "$WINDOW_IS_FULLSCREEN" = "true" ]
+  then
+    COLOR=$WINDOW_FULLSCREEN_COLOR
+
+  elif [ "$WINDOW_HAS_FOCUS" = "true" ]
+  then
+    COLOR=$WINDOW_FOCUSED_COLOR
+
+  elif [ "$WINDOW_IS_MINIMIZED" = "true" ]
+  then
+    COLOR=$WINDOW_MINIMIZED_COLOR
+
+  elif [ "$WINDOW_IS_HIDDEN" = "true" ]
+  then
+    COLOR=$WINDOW_HIDDEN_COLOR
+
+  fi
+
+  sketchybar --animate sin 10 --set "yabai-window-${WINDOW_ID}" icon.color=$COLOR
+}
+
 create_window() {
   source "$CONFIG_DIR/colors.sh"
 
@@ -26,8 +59,7 @@ create_window() {
               --set "$ITEM_NAME"  "${window_icon_base[@]}"  \
                                   icon="$ICON_NAME"         \
                                   icon.color=$WINDOW_DEFAULT_COLOR
-                                  
-    # windows=$(echo $windows "$ITEM_NAME")
+  refresh_window "$WINDOW_ID"
   # FIXME: Reorder windows afterwards to insert new one in space, and then display it all with animate. Here or in application_launched ?
 }
 

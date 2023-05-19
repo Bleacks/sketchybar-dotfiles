@@ -39,7 +39,9 @@ application_launched() {
 }
 
 window_focused() {
-  echo window_focused
+  WINDOW_ID="$1"
+
+  refresh_window "$WINDOW_ID"
 }
 
 case "$SENDER" in
@@ -61,7 +63,7 @@ case "$SENDER" in
   ;;
   "window_destroyed") window_destroyed "$YABAI_WINDOW_ID"
   ;;
-  "window_focused") window_focused
+  "window_focused") window_focused "$YABAI_WINDOW_ID"
   ;;
   # "window_moved") window_moved
   # ;;
