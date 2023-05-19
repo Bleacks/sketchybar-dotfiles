@@ -1,10 +1,10 @@
 #!/bin/bash
 
-source "$PLUGIN_DIR/yabai/utility.sh"
-source "$PLUGIN_DIR/yabai/styles.sh"
+source "$YABAI_PLUGIN_DIR/utility.sh"
+source "$YABAI_PLUGIN_DIR/styles.sh"
 
 yabai=(
-  script="$PLUGIN_DIR/yabai/listeners.sh"
+  script="$YABAI_PLUGIN_DIR/listeners.sh"
   icon.font="$FONT:Bold:16.0"
   # associated_display=active
   # ignore_association=on
@@ -40,25 +40,11 @@ do
       
       while read -r WINDOW_ID
       do
-        WINDOW=$(yabai -m query --windows --window "$WINDOW_ID")
-        WINDOW_APP=$(echo "$WINDOW" | jq -r '.app')
-        FILTERED_RESULTS=$(echo "$WINDOW_APP" | grep -E "$YABAI_IGNORED_APP_REGEX")
+        create_window "$WINDOW_ID"
         
-        if [ "$FILTERED_RESULTS" = "" ]
-        then
+        WINDOW_ITEM_NAME="yabai-window-$WINDOW_ID"
+        ITEMS_TO_BRACKET=$(echo $ITEMS_TO_BRACKET "$WINDOW_ITEM_NAME")
 
-          WINDOW_ITEM_NAME="yabai-window-$WINDOW_ID"
-          ICON_NAME=$($CONFIG_DIR/plugins/icon_map.sh "$WINDOW_APP")
-          
-          sketchybar \
-              --add item "$WINDOW_ITEM_NAME" left \
-              --set "$WINDOW_ITEM_NAME" \
-                icon="$ICON_NAME" \
-                icon.color="$WINDOW_DEFAULT_COLOR" \
-                "${window_icon_base[@]}"
-                
-          ITEMS_TO_BRACKET=$(echo $ITEMS_TO_BRACKET "$WINDOW_ITEM_NAME")
-        fi
       done <<< "$ALL_SPACE_WINDOWS_ID"
 
       sketchybar --add bracket "$SPACE_ITEM_NAME-bracket" $ITEMS_TO_BRACKET \
@@ -80,6 +66,7 @@ do
     sketchybar \
               --add item "$SPACE_ITEM_NAME-splitter" left \
                 "${space_splitter_base[@]}"
+    refresh_space "$SPACE_ID"
   done
 done <<< "$CURRENT_SPACES"
 

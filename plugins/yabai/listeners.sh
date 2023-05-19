@@ -27,7 +27,10 @@ window_destroyed() {
 }
 
 space_changed() {
-  echo space_changed
+  CURRENT_SPACE_ID="$1"
+  RECENT_SPACE_ID="$2"
+  refresh_space "$CURRENT_SPACE_ID"
+  refresh_space "$RECENT_SPACE_ID"
 }
 
 application_launched() {
@@ -53,9 +56,9 @@ case "$SENDER" in
   # ;;
   # "application_hidden") application_hidden
   # ;;
-  "window_created") window_created $YABAI_WINDOW_ID
+  "window_created") window_created "$YABAI_WINDOW_ID"
   ;;
-  "window_destroyed") window_destroyed $YABAI_WINDOW_ID
+  "window_destroyed") window_destroyed "$YABAI_WINDOW_ID"
   ;;
   "window_focused") window_focused
   ;;
@@ -69,7 +72,7 @@ case "$SENDER" in
   # ;;
   # "window_title_changed") window_title_changed
   # ;;
-  "space_changed") space_changed
+  "space_changed") space_changed "$YABAI_SPACE_ID" "$YABAI_RECENT_SPACE_ID"
   ;;
   # "display_added") display_added
   # ;;

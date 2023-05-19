@@ -13,6 +13,7 @@ window_icon_base=(
   icon.padding_left=0
   icon.padding_right=0
   y_offset=0.5
+  label.drawing=off
 )
 
 space_splitter_base=(
