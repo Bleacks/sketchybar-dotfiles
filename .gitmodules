@@ -1,0 +1,3 @@
+[submodule "plugins/Dynamic-Island-Sketchybar"]
+	path = plugins/Dynamic-Island-Sketchybar
+	url = git@github-bleacks:Bleacks/Dynamic-Island-Sketchybar.git
