@@ -1,4 +1,6 @@
 source "$CONFIG_DIR/plugins/yabai/styles.sh"
+source "$CONFIG_DIR/plugins/yabai/config.sh"
+
 
 #
 # Utility functions
@@ -14,6 +16,8 @@ refresh_window() {
   WINDOW_IS_MINIMIZED=$(echo "$WINDOW" | jq '."is-minimized"')
   WINDOW_HAS_FOCUS=$(echo "$WINDOW" | jq '."has-focus"')
   SPACE_ID=$(echo "$WINDOW" | jq '."space"')
+
+  sketchybar --move "yabai-window-$WINDOW_ID" after "yabai-space-${SPACE_ID}-id"
 
   COLOR=$WINDOW_DEFAULT_COLOR
 
@@ -42,27 +46,35 @@ refresh_window() {
 
 create_window() {
   source "$CONFIG_DIR/colors.sh"
+  # FIXME: Ignore tooltip in applications
 
   WINDOW_ID="$1"
   WINDOW=$(yabai -m query --windows --window "$WINDOW_ID")
-  SPACE_ID=$(echo "$WINDOW" | jq '.space')
-  APP=$(echo "$WINDOW" | jq -r '.app')
-
-  IS_VISIBLE=$(echo "$APP" | grep -E "$YABAI_IGNORED_APP_REGEX")
-  ITEM_NAME="yabai-window-${WINDOW_ID}"
-
-  ICON_NAME=""
-  if [ "$IS_VISIBLE" = "" ]
+  WINDOW_ROLE=$(echo "$WINDOW" | jq -r '.role')
+  WINDOW_TITLE=$(echo "$WINDOW" | jq -r '.title')
+  if [ "$WINDOW_ROLE" != "AXHelpTag" ] && [ "$WINDOW_TITLE" != "" ]
   then
-    ICON_NAME=$($CONFIG_DIR/plugins/icon_map.sh "$APP")
-  fi
+    SPACE_ID=$(echo "$WINDOW" | jq '.space')
+
+    WINDOW_APP=$(echo "$WINDOW" | jq -r '.app')
+    IS_VISIBLE="$(echo "$WINDOW_APP" | grep -E "$YABAI_IGNORED_APP_REGEX")$(echo "$WINDOW_TITLE" | grep -E "$YABAI_IGNORED_TITLE_REGEX")"
+    ITEM_NAME="yabai-window-${WINDOW_ID}"
+
+    ICON_NAME=""
+    if [ "$IS_VISIBLE" = "" ]
+    then
+      ICON_NAME=$($CONFIG_DIR/plugins/icon_map.sh "$WINDOW_APP")
+    fi
+      
+    sketchybar  --animate sin 5                               \
+                --add item "$ITEM_NAME" left                  \
+                --set "$ITEM_NAME"  "${window_icon_base[@]}"  \
+                                    icon="$ICON_NAME"         \
+                                    icon.color=$WINDOW_DEFAULT_COLOR
     
-  sketchybar  --animate sin 5                               \
-              --add item "$ITEM_NAME" left                  \
-              --set "$ITEM_NAME"  "${window_icon_base[@]}"  \
-                                  icon="$ICON_NAME"         \
-                                  icon.color=$WINDOW_DEFAULT_COLOR
-  refresh_window "$WINDOW_ID" &
+    sketchybar --move "$ITEM_NAME" after "yabai-space-${SPACE_ID}-id"
+    refresh_window "$WINDOW_ID" &
+  fi
   # FIXME: Reorder windows afterwards to insert new one in space, and then display it all with animate. Here or in application_launched ?
 }
 

@@ -1,0 +1,2 @@
+
+export YABAI_IGNORED_APP_REGEX="" # List of | separated regex to exclude app from bar
