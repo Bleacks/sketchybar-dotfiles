@@ -38,6 +38,23 @@ application_launched() {
   echo application_launched
 }
 
+application_front_switched() {
+  # CURRENT_PROCESS_ID="$1"
+  # CURRENT_WINDOW=$(yabai -m query --windows | jq --arg FILTER "$CURRENT_PROCESS_ID" '.[] | select(.pid == ($FILTER | tonumber)) | .id')
+  # for WINDOW_ID in $CURRENT_WINDOW
+  # do
+  #   refresh_window "$WINDOW_ID" &
+  # done
+  
+  RECENT_PROCESS_ID="$2"
+  RECENT_WINDOW=$(yabai -m query --windows | jq --arg FILTER "$RECENT_PROCESS_ID" '.[] | select(.pid == ($FILTER | tonumber)) | .id')
+
+  for WINDOW_ID in $RECENT_WINDOW
+  do
+    refresh_window "$WINDOW_ID"
+  done
+}
+
 window_focused() {
   WINDOW_ID="$1"
 
@@ -49,8 +66,8 @@ case "$SENDER" in
   ;;
   # "application_terminated") application_terminated
   # ;;
-  # "application_front_switched") application_front_switched
-  # ;;
+  "application_front_switched") application_front_switched "$YABAI_PROCESS_ID" "$YABAI_RECENT_PROCESS_ID"
+  ;;
   # "application_activated") application_activated
   # ;;
   # "application_deactivated") application_deactivated
