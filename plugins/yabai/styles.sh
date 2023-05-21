@@ -6,6 +6,13 @@ space_icon_base=(
   icon.highlight_color=$BLACK
 )
 
+space_bracket=(
+  background.color=$BACKGROUND_1
+  background.border_color=$BACKGROUND_2
+  # background.highlight=off
+  # background.highlight_color=$BLACK
+)
+
 window_icon_base=(
   icon.drawing=on
   drawing=on
@@ -17,9 +24,7 @@ window_icon_base=(
 )
 
 space_splitter_base=(
-  background.padding_left=-5
-  background.padding_right=-5
-  padding_left=-5
-  padding_right=-5
+  label.drawing=off
+  icon.drawing=off
   width=0
 )

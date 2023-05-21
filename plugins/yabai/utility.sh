@@ -1,6 +1,47 @@
 source "$CONFIG_DIR/plugins/yabai/styles.sh"
 source "$CONFIG_DIR/plugins/yabai/config.sh"
 
+SPACE_PREFIX="yabai-space"
+WINDOW_PREFIX="yabai-window"
+
+#
+# Common functions
+#
+
+get_space_item_name() {
+  SPACE_INDEX="$1"
+  echo "${SPACE_PREFIX}-${SPACE_INDEX}"
+}
+
+get_window_item_name() {
+  WINDOW_ID="$1"
+  echo "${WINDOW_PREFIX}-${WINDOW_ID}"
+}
+
+get_space_head_item_name() {
+  SPACE_INDEX="$1"
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
+  echo "$SPACE_ITEM_NAME-head"
+}
+
+get_space_tail_item_name() {
+  SPACE_INDEX="$1"
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
+  echo "$SPACE_ITEM_NAME-tail"
+}
+
+get_space_bracket_item_name() {
+  SPACE_INDEX="$1"
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
+  echo "$SPACE_ITEM_NAME-bracket"
+}
+
+get_space_index_from_id() {
+  SPACE_ID="$1"
+  ALL_SPACES=$(yabai -m query --spaces)
+  SPACE_INDEX=$(echo "$ALL_SPACES" | jq --arg FILTER "$SPACE_ID" '.[] | select(.["id"] == ($FILTER | tonumber)) | .index')
+  echo "$SPACE_INDEX"
+}
 
 #
 # Utility functions
@@ -17,31 +58,41 @@ refresh_window() {
   WINDOW_HAS_FOCUS=$(echo "$WINDOW" | jq '."has-focus"')
   SPACE_ID=$(echo "$WINDOW" | jq '."space"')
 
-  sketchybar --move "yabai-window-$WINDOW_ID" after "yabai-space-${SPACE_ID}-id"
+  WINDOW_ROLE=$(echo "$WINDOW" | jq -r '.role')
+  WINDOW_TITLE=$(echo "$WINDOW" | jq -r '.title')
 
   COLOR=$WINDOW_DEFAULT_COLOR
 
+  WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_ID")
+  # SPACE_ITEM_NAME=$(get_space_item_name "yabai-space-1")
+  
   if [ "$WINDOW_IS_FULLSCREEN" ] || [ "$WINDOW_IS_HIDDEN" ] || [ "$WINDOW_IS_MINIMIZED" ] || [ "$WINDOW_HAS_FOCUS" ]
   then
     if [ "$WINDOW_IS_FULLSCREEN" = "true" ]
     then
-      COLOR=$WINDOW_FULLSCREEN_COLOR
+      COLOR="$WINDOW_FULLSCREEN_COLOR"
 
     elif [ "$WINDOW_IS_HIDDEN" = "true" ]
     then
-      COLOR=$WINDOW_HIDDEN_COLOR
+      COLOR="$WINDOW_HIDDEN_COLOR"
 
     elif [ "$WINDOW_IS_MINIMIZED" = "true" ]
     then
-      COLOR=$WINDOW_MINIMIZED_COLOR
+      COLOR="$WINDOW_MINIMIZED_COLOR"
 
     elif [ "$WINDOW_HAS_FOCUS" = "true" ]
     then
-      COLOR=$WINDOW_FOCUSED_COLOR
+      COLOR="$WINDOW_FOCUSED_COLOR"
     fi
   fi
 
-  sketchybar --animate sin 10 --set "yabai-window-${WINDOW_ID}" icon.color=$COLOR
+  WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+  sketchybar --animate sin 10 --set "$WINDOW_ITEM_NAME" icon.color=$COLOR
+
+  # SPACE_INDEX=$(get_space_index_from_id "$SPACE_ID")
+  SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_ID")
+  # refresh_space "$SPACE_INDEX"
 }
 
 create_window() {
@@ -58,36 +109,123 @@ create_window() {
 
     WINDOW_APP=$(echo "$WINDOW" | jq -r '.app')
     IS_VISIBLE="$(echo "$WINDOW_APP" | grep -E "$YABAI_IGNORED_APP_REGEX")$(echo "$WINDOW_TITLE" | grep -E "$YABAI_IGNORED_TITLE_REGEX")"
-    ITEM_NAME="yabai-window-${WINDOW_ID}"
+    
+    WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+    SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
 
     ICON_NAME=""
     if [ "$IS_VISIBLE" = "" ]
     then
       ICON_NAME=$($CONFIG_DIR/plugins/icon_map.sh "$WINDOW_APP")
     fi
-      
+
     sketchybar  --animate sin 5                               \
-                --add item "$ITEM_NAME" left                  \
-                --set "$ITEM_NAME"  "${window_icon_base[@]}"  \
+                --add item "$WINDOW_ITEM_NAME" left                  \
+                --set "$WINDOW_ITEM_NAME"  "${window_icon_base[@]}"  \
                                     icon="$ICON_NAME"         \
                                     icon.color=$WINDOW_DEFAULT_COLOR
     
-    sketchybar --move "$ITEM_NAME" after "yabai-space-${SPACE_ID}-id"
-    refresh_window "$WINDOW_ID" &
+    SPACE_INDEX=$(get_space_index_from_id "$SPACE_ID")
+    SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_ID")
+    
+    # sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
+
+    # refresh_window "$WINDOW_ID" &
+    # refresh_space "$SPACE_INDEX" &
   fi
   # FIXME: Reorder windows afterwards to insert new one in space, and then display it all with animate. Here or in application_launched ?
 }
 
 destroy_window() {
   WINDOW_ID="$1"
-  sketchybar --remove "yabai-window-$WINDOW_ID"
+  WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+  sketchybar --remove "$WINDOW_ITEM_NAME"
   # FIXME: Handle cases where space is destroyed as well
   # FIXME: Need to reorder afterwards ? 
 }
 
+create_space_head() {
+  SPACE_INDEX="$1"
+  SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_INDEX")
+
+  sketchybar  --add item "$SPACE_HEAD_ITEM_NAME" left  \
+              --set "$SPACE_HEAD_ITEM_NAME"            \
+                    label="$SPACE_INDEX"             \
+                    "${space_icon_base[@]}"
+
+  echo "$SPACE_HEAD_ITEM_NAME"
+}
+
+create_space_windows_splitter() {
+  SPACE_SPACER_NAME="$1"
+  sketchybar  --add item "$SPACE_SPACER_NAME" left "${space_windows_splitter_base[@]}"
+}
+
+create_spacer() {
+  SPACE_SPACER_NAME="$1"
+  sketchybar  --add item "$SPACE_SPACER_NAME" left "${space_splitter_base[@]}"
+}
+
+create_space_tail() {
+  SPACE_INDEX="$1"
+  SPACE_TAIL_ITEM_NAME=$(get_space_tail_item_name "$SPACE_INDEX")
+
+  create_spacer "$SPACE_TAIL_ITEM_NAME"
+  echo "$SPACE_TAIL_ITEM_NAME"
+}
+
+create_space_bracket() {
+  SPACE_INDEX="$1"
+  SPACE_BRACKET_ITEM_NAME=$(get_space_bracket_item_name "$SPACE_INDEX")
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
+  sketchybar  --animate sin 7  \
+              --add bracket "$SPACE_BRACKET_ITEM_NAME" "/${SPACE_ITEM_NAME}-.*/" \
+              --set "$SPACE_BRACKET_ITEM_NAME" "${space_bracket[@]}"
+  echo "$SPACE_BRACKET_ITEM_NAME"
+}
+
+create_space() {
+  SPACE_INDEX="$1"
+  SPACE=$(yabai -m query --spaces --space "$SPACE_INDEX")
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
+  WINDOWS_ID_IN_SPACE=$(echo "$SPACE" | jq -r '.windows[]')
+
+  SPACE_HEAD_ITEM_NAME=$(create_space_head "$SPACE_INDEX")
+  
+  while read -r WINDOW_ID
+  do
+    WINDOW_ITEM_NAME=$(create_window "$WINDOW_ID")
+
+  done <<< "$WINDOWS_ID_IN_SPACE"
+
+  SPACE_TAIL_ITEM_NAME=$(create_space_tail "$SPACE_INDEX")
+
+  SPACE_BRACKET_ITEM_NAME=$(create_space_bracket "$SPACE_INDEX")
+
+  # FIXME: Find out why a window icon is added to space when no window are in space
+
+  SPACE_SPLITTER_NAME="${SPACE_ITEM_NAME}-splitter"
+  create_spacer "$SPACE_SPLITTER_NAME"
+
+
+  refresh_space "$SPACE_INDEX"
+}
+
+refresh_window_in_space() {
+  SPACE_INDEX="$1"
+  SPACE=$(yabai -m query --spaces --space "$SPACE_INDEX")
+  WINDOWS_ID_IN_SPACE=$(echo "$SPACE" | jq -r '.windows[]')
+
+  while read -r WINDOW_ID
+  do
+    WINDOW_ITEM_NAME=$(refresh_window "$WINDOW_ID")
+
+  done <<< "$WINDOWS_ID_IN_SPACE"
+} 
+
+
 refresh_space() {
-  SPACE_ID="$1"
-  SPACE_INDEX=$(yabai -m query --spaces | jq --arg FILTER "$SPACE_ID" '.[] | select(.["id"] == ($FILTER | tonumber)) | .index')
+  SPACE_INDEX="$1"
   SPACE=$(yabai -m query --spaces --space "$SPACE_INDEX")
 
   SPACE_HAS_FOCUS=$(echo "$SPACE" | jq '."has-focus"')
@@ -109,11 +247,33 @@ refresh_space() {
     BORDER_COLOR=$SPACE_BORDER_FOCUSED
   fi
 
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
+  SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_INDEX")
+  SPACE_BRACKET_NAME=$(get_space_bracket_item_name "$SPACE_INDEX")
   sketchybar  --animate sin 10 \
-              --set "yabai-space-${SPACE_INDEX}-bracket" \
+              --set "$SPACE_BRACKET_NAME" \
                     background.border_color="$BORDER_COLOR" \
                     background.color="$BACKGROUND_COLOR" \
                     label.color="$LABEL_COLOR" \
-              --set "yabai-space-${SPACE_INDEX}-id" \
+              --set "${SPACE_HEAD_ITEM_NAME}" \
                     label.color="$LABEL_COLOR"
+
+  refresh_window_in_space "$SPACE_INDEX"
+}
+
+create_bar() {
+  CURRENT_SPACES="$(yabai -m query --spaces | jq -r '.[].index | @sh')"
+
+  create_spacer "yabai-start"
+  create_spacer "yabai-end"
+
+  while read -r LINE
+  do
+    for SPACE_INDEX in $LINE
+    do
+      create_space "$SPACE_INDEX"
+    done
+  done <<< "$CURRENT_SPACES"
+
+
 }

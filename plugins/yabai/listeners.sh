@@ -27,11 +27,15 @@ window_destroyed() {
 }
 
 space_changed() {
+  source "$CONFIG_DIR/plugins/yabai/utility.sh"
   CURRENT_SPACE_ID="$1"
   RECENT_SPACE_ID="$2"
+  
+  CURRENT_SPACE_INDEX=$(get_space_index_from_id "$CURRENT_SPACE_ID")
+  RECENT_SPACE_INDEX=$(get_space_index_from_id "$RECENT_SPACE_ID")
 
-  refresh_space "$CURRENT_SPACE_ID"
-  refresh_space "$RECENT_SPACE_ID"
+  refresh_space "$CURRENT_SPACE_INDEX" &
+  refresh_space "$RECENT_SPACE_INDEX" &
 }
 
 application_launched() {
@@ -49,10 +53,10 @@ application_front_switched() {
   RECENT_PROCESS_ID="$2"
   RECENT_WINDOW=$(yabai -m query --windows | jq --arg FILTER "$RECENT_PROCESS_ID" '.[] | select(.pid == ($FILTER | tonumber)) | .id')
 
-  for WINDOW_ID in $RECENT_WINDOW
-  do
-    refresh_window "$WINDOW_ID"
-  done
+  # for WINDOW_ID in $RECENT_WINDOW
+  # do
+  #   refresh_window "$WINDOW_ID" &
+  # done
 }
 
 window_focused() {
