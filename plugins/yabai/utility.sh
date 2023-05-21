@@ -56,7 +56,7 @@ refresh_window() {
   WINDOW_IS_HIDDEN=$(echo "$WINDOW" | jq '."is-hidden"')
   WINDOW_IS_MINIMIZED=$(echo "$WINDOW" | jq '."is-minimized"')
   WINDOW_HAS_FOCUS=$(echo "$WINDOW" | jq '."has-focus"')
-  SPACE_ID=$(echo "$WINDOW" | jq '."space"')
+  SPACE_INDEX=$(echo "$WINDOW" | jq '."space"')
 
   WINDOW_ROLE=$(echo "$WINDOW" | jq -r '.role')
   WINDOW_TITLE=$(echo "$WINDOW" | jq -r '.title')
@@ -64,8 +64,7 @@ refresh_window() {
   COLOR=$WINDOW_DEFAULT_COLOR
 
   WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
-  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_ID")
-  # SPACE_ITEM_NAME=$(get_space_item_name "yabai-space-1")
+  SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
   
   if [ "$WINDOW_IS_FULLSCREEN" ] || [ "$WINDOW_IS_HIDDEN" ] || [ "$WINDOW_IS_MINIMIZED" ] || [ "$WINDOW_HAS_FOCUS" ]
   then
@@ -76,23 +75,25 @@ refresh_window() {
     elif [ "$WINDOW_IS_HIDDEN" = "true" ]
     then
       COLOR="$WINDOW_HIDDEN_COLOR"
+      SPACE_TAIL_ITEM_NAME=$(get_space_tail_item_name "$SPACE_INDEX")
+      sketchybar --move "$WINDOW_ITEM_NAME" before "$SPACE_TAIL_ITEM_NAME"
 
     elif [ "$WINDOW_IS_MINIMIZED" = "true" ]
     then
       COLOR="$WINDOW_MINIMIZED_COLOR"
+      SPACE_TAIL_ITEM_NAME=$(get_space_tail_item_name "$SPACE_INDEX")
+      sketchybar --move "$WINDOW_ITEM_NAME" before "$SPACE_TAIL_ITEM_NAME"
 
     elif [ "$WINDOW_HAS_FOCUS" = "true" ]
     then
       COLOR="$WINDOW_FOCUSED_COLOR"
+      SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_INDEX")
+      sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
     fi
   fi
 
   WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
   sketchybar --animate sin 10 --set "$WINDOW_ITEM_NAME" icon.color=$COLOR
-
-  # SPACE_INDEX=$(get_space_index_from_id "$SPACE_ID")
-  SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_ID")
-  # refresh_space "$SPACE_INDEX"
 }
 
 create_window() {
@@ -128,7 +129,7 @@ create_window() {
     SPACE_INDEX=$(get_space_index_from_id "$SPACE_ID")
     SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_ID")
     
-    # sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
+    sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
 
     # refresh_window "$WINDOW_ID" &
     # refresh_space "$SPACE_INDEX" &
@@ -208,10 +209,21 @@ create_space() {
   create_spacer "$SPACE_SPLITTER_NAME"
 
 
-  refresh_space "$SPACE_INDEX"
+  refresh_space "$SPACE_INDEX" &
 }
 
-refresh_window_in_space() {
+refresh_windows_of_process () {
+  PROCESS_ID="$1"
+  WINDOWS_IDS=$(yabai -m query --windows | jq --arg FILTER "$PROCESS_ID" '.[] | select(.pid == ($FILTER | tonumber)) | .id')
+  
+  for WINDOW_ID in $WINDOWS_IDS
+  do
+    refresh_window "$WINDOW_ID" &
+  done
+}
+
+# TODO: make use of Yabai's stack-index field to order windows
+refresh_windows_in_space() {
   SPACE_INDEX="$1"
   SPACE=$(yabai -m query --spaces --space "$SPACE_INDEX")
   WINDOWS_ID_IN_SPACE=$(echo "$SPACE" | jq -r '.windows[]')
@@ -258,7 +270,7 @@ refresh_space() {
               --set "${SPACE_HEAD_ITEM_NAME}" \
                     label.color="$LABEL_COLOR"
 
-  refresh_window_in_space "$SPACE_INDEX"
+  refresh_windows_in_space "$SPACE_INDEX"
 }
 
 create_bar() {
@@ -274,6 +286,4 @@ create_bar() {
       create_space "$SPACE_INDEX"
     done
   done <<< "$CURRENT_SPACES"
-
-
 }
