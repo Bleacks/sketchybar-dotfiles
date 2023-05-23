@@ -14,7 +14,7 @@ space_changed() {
   CURRENT_SPACE_INDEX=$(get_space_index_from_id "$CURRENT_SPACE_ID")
   RECENT_SPACE_INDEX=$(get_space_index_from_id "$RECENT_SPACE_ID")
 
-  refresh_space "$CURRENT_SPACE_INDEX" &
+  # refresh_space "$CURRENT_SPACE_INDEX" &
   refresh_space "$RECENT_SPACE_INDEX" &
 }
 
@@ -30,7 +30,7 @@ application_front_switched() {
   refresh_windows_of_process "$RECENT_PROCESS_ID"
 }
 
-window_focused() {
+window_state_changed() {
   WINDOW_ID="$1"
   WINDOW=$(yabai -m query --windows --window "$WINDOW_ID")
   SPACE_INDEX=$(echo "$WINDOW" | jq '.space')
@@ -38,11 +38,12 @@ window_focused() {
   refresh_space "$SPACE_INDEX"
 }
 
+# echo '  >>>> SENDER' $SENDER "$YABAI_PROCESS_ID" "$YABAI_RECENT_PROCESS_ID" "$YABAI_WINDOW_ID" "$YABAI_SPACE_ID" "$YABAI_DISPLAY_ID" "$YABAI_RECENT_SPACE_ID" "$YABAI_RECENT_DISPLAY_ID" "$SPACE_INDEX" "$WINDOW_ID" "$DISPLAY_ID"
 # TODO: Resourcess optimization - Implement a queue to send refresh udpates to, processing messages with a minor arbitrary delay to remove duplicate request from overlapping yabai signal
 # TODO: Delete unused signal and trigger from yabairc and items/yabai.sh
 case "$SENDER" in
-  "application_launched") application_launched
-  ;;
+  # "application_launched") application_launched
+  # ;;
   # "application_terminated") application_terminated
   # ;;
   "application_front_switched") application_front_switched "$YABAI_PROCESS_ID" "$YABAI_RECENT_PROCESS_ID"
@@ -60,13 +61,13 @@ case "$SENDER" in
   "window_destroyed") destroy_window "$YABAI_WINDOW_ID"
   ;;
   # "window_focused") refresh_window "$YABAI_WINDOW_ID"
-  "window_focused") window_focused "$YABAI_WINDOW_ID"
+  "window_focused") window_state_changed "$YABAI_WINDOW_ID"
   ;;
   # "window_moved") window_moved
   # ;;
   # "window_resized") window_resized
   # ;;
-  "window_minimized") refresh_window "$YABAI_WINDOW_ID"
+  "window_minimized") window_state_changed "$YABAI_WINDOW_ID"
   ;;
   # "window_deminimized") window_deminimized # Overlaps with window_focused, as window is focused by MacOS when deminimized by default
   # ;;
@@ -86,6 +87,14 @@ case "$SENDER" in
   # ;;
   # "mouse.clicked") mouse_clicked
   # ;;
+  "refresh_space") refresh_space "$SPACE_INDEX"
+  ;;
+  "refresh_window") refresh_window "$WINDOW_ID"
+  ;;
+  # "refresh_display") refresh_display "$DISPLAY_ID"
+  # ;;
+  "window_moved") update_window_space "$WINDOW_ID" "$SPACE_INDEX"
+  ;;
   # "forced") exit 0
   # ;;
   # # ;;

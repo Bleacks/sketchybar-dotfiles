@@ -29,8 +29,17 @@ case $@ in
 "KeePassXC")
   icon_result=":kee_pass_x_c:"
   ;;
+"Keeper")
+  icon_result="󱤓"
+  ;;
 "Microsoft Edge")
-  icon_result=":microsoft_edge:"
+  icon_result="󰇩"
+  ;;
+"Microsoft Sharepoint")
+  icon_result="󱎑"
+  ;;
+"Microsoft OneDrive")
+  icon_result="󰏊"
   ;;
 "VLC")
   icon_result=":vlc:"
@@ -66,7 +75,13 @@ case $@ in
   icon_result=":git_hub:"
   ;;
 "App Store")
-  icon_result=":app_store:"
+  icon_result="󱃁"
+  ;;
+"Kaleidoscope")
+  icon_result="󱧭"
+  ;;
+"Sourcetree" | "Git Kraken")
+  icon_result="󰘬"
   ;;
 "Chromium" | "Google Chrome" | "Google Chrome Canary")
   icon_result=":google_chrome:"
@@ -81,10 +96,10 @@ case $@ in
   icon_result=":color_picker:"
   ;;
 "Microsoft Word")
-  icon_result=":microsoft_word:"
+  icon_result="󱎒"
   ;;
 "Microsoft Teams")
-  icon_result=":microsoft_teams:"
+  icon_result="󰊻"
   ;;
 "Iris")
   icon_result=":iris:"
@@ -129,10 +144,13 @@ case $@ in
   icon_result=":pine:"
   ;;
 "Microsoft Excel")
-  icon_result=":microsoft_excel:"
+  icon_result="󱎏"
   ;;
 "Microsoft PowerPoint")
-  icon_result=":microsoft_power_point:"
+  icon_result="󱎐"
+  ;;
+"Microsoft OneNote")
+  icon_result="󰝇"
   ;;
 "Matlab")
   icon_result=":matlab:"
@@ -159,7 +177,7 @@ case $@ in
   icon_result=":firefox_developer_edition:"
   ;;
 "Trello")
-  icon_result=":trello:"
+  icon_result="󰔲"
   ;;
 "TickTick")
   icon_result=":tick_tick:"
@@ -331,9 +349,6 @@ case $@ in
 "Preview" | "Skim" | "zathura")
   icon_result=":pdf:"
   ;;
-"1Password 7")
-  icon_result=":one_password:"
-  ;;
 "Code" | "Code - Insiders")
   icon_result="󰨞"
   ;;
@@ -393,7 +408,10 @@ case $@ in
   icon_result="󰄦"
   ;;
 "Font Book")
-  icon_result=""
+  icon_result=""
+  ;;
+"OpenVPN Connect")
+  icon_result=""
   ;;
 *)
   icon_result="󱀶"

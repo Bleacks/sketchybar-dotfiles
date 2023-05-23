@@ -76,19 +76,16 @@ refresh_window() {
     then
       COLOR="$WINDOW_HIDDEN_COLOR"
       SPACE_TAIL_ITEM_NAME=$(get_space_tail_item_name "$SPACE_INDEX")
-      sketchybar --move "$WINDOW_ITEM_NAME" before "$SPACE_TAIL_ITEM_NAME"
 
     elif [ "$WINDOW_IS_MINIMIZED" = "true" ]
     then
       COLOR="$WINDOW_MINIMIZED_COLOR"
       SPACE_TAIL_ITEM_NAME=$(get_space_tail_item_name "$SPACE_INDEX")
-      sketchybar --move "$WINDOW_ITEM_NAME" before "$SPACE_TAIL_ITEM_NAME"
 
     elif [ "$WINDOW_HAS_FOCUS" = "true" ]
     then
       COLOR="$WINDOW_FOCUSED_COLOR"
       SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_INDEX")
-      sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
     fi
   fi
 
@@ -212,14 +209,76 @@ create_space() {
   refresh_space "$SPACE_INDEX" &
 }
 
+update_window_space() {
+  WINDOW_ID="$1"
+  SPACE_INDEX="$2"
+
+  WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+  SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_INDEX")
+
+  sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
+  refresh_space "$SPACE_INDEX"
+}
+
+reorder_window_list() {
+  WINDOW_IDS="$1"
+
+  FOCUSED_WINDOW=""
+  FULLSCREEN_WINDOWS=""
+  HIDDEN_WINDOWS=""
+  MINIMIZED_WINDOWS=""
+  NORMAL_WINDOWS=""
+
+  while read -r WINDOW_ID
+  do
+    WINDOW=$(yabai -m query --windows --window "$WINDOW_ID")
+    WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+    WINDOW_IS_FULLSCREEN=$(echo "$WINDOW" | jq '."is-native-fullscreen"')
+    WINDOW_IS_HIDDEN=$(echo "$WINDOW" | jq '."is-hidden"')
+    WINDOW_IS_MINIMIZED=$(echo "$WINDOW" | jq '."is-minimized"')
+    WINDOW_IS_TOPMOST=$(echo "$WINDOW" | jq '."is-topmost"')
+    
+    if [ "$WINDOW_IS_FULLSCREEN" = "true" ]
+    then
+      FULLSCREEN_WINDOWS="$FULLSCREEN_WINDOWS $WINDOW_ITEM_NAME"
+
+    elif [ "$WINDOW_IS_HIDDEN" = "true" ]
+    then
+      HIDDEN_WINDOWS="$HIDDEN_WINDOWS $WINDOW_ITEM_NAME"
+
+    elif [ "$WINDOW_IS_MINIMIZED" = "true" ]
+    then
+      MINIMIZED_WINDOWS="$MINIMIZED_WINDOWS $WINDOW_ITEM_NAME"
+
+    elif [ "$WINDOW_IS_TOPMOST" = "true" ]
+    then
+      TOPMOST_WINDOWS="$TOPMOST_WINDOWS $WINDOW_ITEM_NAME"
+
+    else
+      NORMAL_WINDOWS="$NORMAL_WINDOWS $WINDOW_ITEM_NAME"
+    fi
+  done <<< "$WINDOW_IDS"
+
+  sketchybar --reorder $TOPMOST_WINDOWS $FULLSCREEN_WINDOWS $NORMAL_WINDOWS $HIDDEN_WINDOWS $MINIMIZED_WINDOWS
+}
+
+refresh_window_list() {
+  WINDOW_IDS="$1"
+  while read -r WINDOW_ID
+  do
+    refresh_window "$WINDOW_ID" &
+  done <<< "$WINDOW_IDS"
+}
+
 refresh_windows_of_process () {
   PROCESS_ID="$1"
   WINDOWS_IDS=$(yabai -m query --windows | jq --arg FILTER "$PROCESS_ID" '.[] | select(.pid == ($FILTER | tonumber)) | .id')
   
-  for WINDOW_ID in $WINDOWS_IDS
-  do
-    refresh_window "$WINDOW_ID" &
-  done
+  refresh_window_list "$WINDOWS_IDS" 
+  # for WINDOW_ID in $WINDOWS_IDS
+  # do
+  #   refresh_window "$WINDOW_ID" &
+  # done
 }
 
 # TODO: make use of Yabai's stack-index field to order windows
@@ -228,11 +287,12 @@ refresh_windows_in_space() {
   SPACE=$(yabai -m query --spaces --space "$SPACE_INDEX")
   WINDOWS_ID_IN_SPACE=$(echo "$SPACE" | jq -r '.windows[]')
 
-  while read -r WINDOW_ID
-  do
-    WINDOW_ITEM_NAME=$(refresh_window "$WINDOW_ID")
-
-  done <<< "$WINDOWS_ID_IN_SPACE"
+  refresh_window_list "$WINDOWS_ID_IN_SPACE" &
+  # while read -r WINDOW_ID
+  # do
+  #   WINDOW_ITEM_NAME=$(refresh_window "$WINDOW_ID")
+  # done <<< "$WINDOWS_ID_IN_SPACE"
+  reorder_window_list "$WINDOWS_ID_IN_SPACE"
 } 
 
 
