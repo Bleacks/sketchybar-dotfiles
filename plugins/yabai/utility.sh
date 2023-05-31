@@ -274,8 +274,11 @@ refresh_window_list() {
 refresh_windows_of_process () {
   PROCESS_ID="$1"
   WINDOWS_IDS=$(yabai -m query --windows | jq --arg FILTER "$PROCESS_ID" '.[] | select(.pid == ($FILTER | tonumber)) | .id')
-  
-  refresh_window_list "$WINDOWS_IDS" 
+
+  if [ "$WINDOWS_IDS" != "" ]
+  then
+    refresh_window_list "$WINDOWS_IDS"
+  fi
   # for WINDOW_ID in $WINDOWS_IDS
   # do
   #   refresh_window "$WINDOW_ID" &
