@@ -13,7 +13,7 @@ space_bracket=(
   # background.highlight_color=$BLACK
 )
 
-window_icon_base=(
+window_icon_default=(
   icon.drawing=on
   drawing=on
   icon.font.size=16
@@ -21,6 +21,12 @@ window_icon_base=(
   icon.padding_right=0
   y_offset=0.5
   label.drawing=off
+)
+
+window_icon_ignored=(
+  drawing=off
+  icon.drawing=off
+  background.drawing=off
 )
 
 space_splitter_base=(

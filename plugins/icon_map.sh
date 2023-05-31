@@ -51,7 +51,7 @@ case $@ in
   icon_result=":thunderbird:"
   ;;
 "Notes")
-  icon_result=":notes:"
+  icon_result="󰺿"
   ;;
 "Caprine")
   icon_result=":caprine:"

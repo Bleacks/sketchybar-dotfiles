@@ -63,7 +63,6 @@ refresh_window() {
 
   COLOR=$WINDOW_DEFAULT_COLOR
 
-  WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
   SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
   
   if [ "$WINDOW_IS_FULLSCREEN" ] || [ "$WINDOW_IS_HIDDEN" ] || [ "$WINDOW_IS_MINIMIZED" ] || [ "$WINDOW_HAS_FOCUS" ]
@@ -101,14 +100,17 @@ create_window() {
   WINDOW=$(yabai -m query --windows --window "$WINDOW_ID")
   WINDOW_ROLE=$(echo "$WINDOW" | jq -r '.role')
   WINDOW_TITLE=$(echo "$WINDOW" | jq -r '.title')
+  WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
+
+  SPACE_INDEX=$(echo "$WINDOW" | jq '.space')
+  SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_INDEX")
+
   if [ "$WINDOW_ROLE" != "AXHelpTag" ] && [ "$WINDOW_TITLE" != "" ]
   then
-    SPACE_ID=$(echo "$WINDOW" | jq '.space')
 
     WINDOW_APP=$(echo "$WINDOW" | jq -r '.app')
     IS_VISIBLE="$(echo "$WINDOW_APP" | grep -E "$YABAI_IGNORED_APP_REGEX")$(echo "$WINDOW_TITLE" | grep -E "$YABAI_IGNORED_TITLE_REGEX")"
     
-    WINDOW_ITEM_NAME=$(get_window_item_name "$WINDOW_ID")
     SPACE_ITEM_NAME=$(get_space_item_name "$SPACE_INDEX")
 
     ICON_NAME=""
@@ -117,20 +119,19 @@ create_window() {
       ICON_NAME=$($CONFIG_DIR/plugins/icon_map.sh "$WINDOW_APP")
     fi
 
-    sketchybar  --animate sin 5                               \
-                --add item "$WINDOW_ITEM_NAME" left                  \
-                --set "$WINDOW_ITEM_NAME"  "${window_icon_base[@]}"  \
-                                    icon="$ICON_NAME"         \
+    sketchybar  --animate sin 5                                         \
+                --add item "$WINDOW_ITEM_NAME" left                     \
+                --set "$WINDOW_ITEM_NAME"  "${window_icon_default[@]}"  \
+                                    icon="$ICON_NAME"                   \
                                     icon.color=$WINDOW_DEFAULT_COLOR
     
-    SPACE_INDEX=$(get_space_index_from_id "$SPACE_ID")
-    SPACE_HEAD_ITEM_NAME=$(get_space_head_item_name "$SPACE_ID")
     
-    sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
-
-    # refresh_window "$WINDOW_ID" &
-    # refresh_space "$SPACE_INDEX" &
+  else
+    sketchybar  --add item "$WINDOW_ITEM_NAME" left                     \
+                --set "$WINDOW_ITEM_NAME"  "${window_icon_ignored[@]}"
   fi
+
+  sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
   # FIXME: Reorder windows afterwards to insert new one in space, and then display it all with animate. Here or in application_launched ?
 }
 
@@ -192,7 +193,7 @@ create_space() {
   
   while read -r WINDOW_ID
   do
-    WINDOW_ITEM_NAME=$(create_window "$WINDOW_ID")
+    create_window "$WINDOW_ID"
 
   done <<< "$WINDOWS_ID_IN_SPACE"
 
