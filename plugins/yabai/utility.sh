@@ -128,7 +128,7 @@ create_window() {
     
   else
     sketchybar  --add item "$WINDOW_ITEM_NAME" left                     \
-                --set "$WINDOW_ITEM_NAME"  "${window_icon_ignored[@]}"
+                --set "$WINDOW_ITEM_NAME"  "${hidden_item[@]}"
   fi
 
   sketchybar --move "$WINDOW_ITEM_NAME" after "$SPACE_HEAD_ITEM_NAME"
@@ -141,6 +141,13 @@ destroy_window() {
   sketchybar --remove "$WINDOW_ITEM_NAME"
   # FIXME: Handle cases where space is destroyed as well
   # FIXME: Need to reorder afterwards ? 
+}
+
+create_hidden_item() {
+  ITEM_NAME="$1"
+
+  sketchybar  --add item "$ITEM_NAME" left                     \
+              --set "$ITEM_NAME"  "${hidden_item[@]}"
 }
 
 create_space_head() {
@@ -339,9 +346,8 @@ refresh_space() {
 
 create_bar() {
   CURRENT_SPACES="$(yabai -m query --spaces | jq -r '.[].index | @sh')"
-
-  create_spacer "yabai-start"
-  create_spacer "yabai-end"
+  
+  create_hidden_item "yabai-start"
 
   while read -r LINE
   do
@@ -350,4 +356,7 @@ create_bar() {
       create_space "$SPACE_INDEX"
     done
   done <<< "$CURRENT_SPACES"
+
+  create_hidden_item "yabai-end"
+
 }

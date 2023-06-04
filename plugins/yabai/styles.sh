@@ -23,10 +23,8 @@ window_icon_default=(
   label.drawing=off
 )
 
-window_icon_ignored=(
+hidden_item=(
   drawing=off
-  icon.drawing=off
-  background.drawing=off
 )
 
 space_splitter_base=(
