@@ -22,7 +22,6 @@ sketchybar  \
             --add event window_focused              \
             --add event window_resized              \
             --add event window_minimized            \
-            --add event window_title_changed        \
             --add event space_changed               \
             --add event display_added               \
             --add event display_removed             \
@@ -34,6 +33,7 @@ sketchybar  \
             --add event refresh_display             \
             --add event window_moved
 
+            # --add event window_title_changed        \
             # --add event application_launched        \
             # --add event application_terminated      \
             # --add event application_activated       \
@@ -50,7 +50,6 @@ sketchybar  \
             --subscribe yabai-helper window_focused             \
             --subscribe yabai-helper window_resized             \
             --subscribe yabai-helper window_minimized           \
-            --subscribe yabai-helper window_title_changed       \
             --subscribe yabai-helper space_changed              \
             --subscribe yabai-helper display_added              \
             --subscribe yabai-helper display_removed            \
@@ -62,6 +61,7 @@ sketchybar  \
             --subscribe yabai-helper refresh_display            \
             --subscribe yabai-helper window_moved
 
+            # --subscribe yabai-helper window_title_changed       \
             # --subscribe yabai-helper application_launched       \
             # --subscribe yabai-helper application_terminated     \
             # --subscribe yabai-helper application_activated      \

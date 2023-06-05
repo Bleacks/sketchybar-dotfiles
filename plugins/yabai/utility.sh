@@ -1,9 +1,6 @@
 source "$CONFIG_DIR/plugins/yabai/styles.sh"
 source "$CONFIG_DIR/plugins/yabai/config.sh"
 
-SPACE_PREFIX="yabai-space"
-WINDOW_PREFIX="yabai-window"
-
 #
 # Common functions
 #
@@ -121,9 +118,12 @@ create_window() {
 
     sketchybar  --animate sin 5                                         \
                 --add item "$WINDOW_ITEM_NAME" left                     \
-                --set "$WINDOW_ITEM_NAME"  "${window_icon_default[@]}"  \
+                --set "$WINDOW_ITEM_NAME"  "${window_item[@]}"  \
                                     icon="$ICON_NAME"                   \
-                                    icon.color=$WINDOW_DEFAULT_COLOR
+                                    icon.color=$WINDOW_DEFAULT_COLOR    \
+                --subscribe "$WINDOW_ITEM_NAME" mouse.entered \
+                                                mouse.exited \
+                                                mouse.clicked
     
     
   else

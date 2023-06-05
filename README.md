@@ -6,4 +6,11 @@ Current efforts are mostly related to yabai, but more will come
 
 Once a first version is ready, an installation and configuration guide will be posted here for specifcs
 
+Known issues:
+- Adding / removing external displays dynamically is not yet implemented
+- Moving space position dynamically is not yet implemented
+- Dynamically switching windows in and out of fullscreen is not yet implemented
+- Windows assigned to all desktops are not supported and mess up window and space display
+- SF Symbols icons aren't using standard padding / size compared to NerfFont
+
 
