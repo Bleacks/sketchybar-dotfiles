@@ -1,54 +1,25 @@
 #!/bin/bash
 
-cpu_top=(
-  label.font="$FONT:Semibold:7"
-  label=CPU
-  icon.drawing=off
-  width=0
-  padding_right=15
-  y_offset=6
+cpu=(
+  padding_right=7
+  padding_left=7
+  update_freq=5
+	label.width=30
+  label=" - "
+	label.padding_left=3
+  script="$PLUGIN_DIR/cpu.sh"
+  icon="$CPU"
 )
 
-cpu_percent=(
-  label.font="$FONT:Heavy:12"
-  label=CPU
-  y_offset=-4
-  padding_right=15
-  width=55
-  icon.drawing=off
-  update_freq=4
-  mach_helper="$HELPER"
+cpu_bracket=(
+  background.color="$CPU_BACKGROUND"
+  background.border_color="$CPU_DEFAULT"
+  background.border_width=2
+  background.padding_right=5
 )
 
-# cpu_sys=(
-#   width=0
-#   graph.color=$RED
-#   graph.fill_color=$RED
-#   label.drawing=off
-#   icon.drawing=off
-#   background.height=30
-#   background.drawing=on
-#   background.color=$TRANSPARENT
-# )
+sketchybar  --add item cpu right          \
+            --set cpu "${cpu[@]}"
 
-# cpu_user=(
-#   graph.color=$BLUE
-#   label.drawing=off
-#   icon.drawing=off
-#   background.height=30
-#   background.drawing=on
-#   background.color=$TRANSPARENT
-# )
-
-sketchybar \
-            --add item cpu.percent right          \
-            --set cpu.percent "${cpu_percent[@]}" # \
-                                                #  \
-            # --add item cpu.top right              \
-            # --set cpu.top "${cpu_top[@]}"         \
-            #                                      \
-          #  --add graph cpu.sys right 75          \
-          #  --set cpu.sys "${cpu_sys[@]}"         \
-          #                                        \
-          #  --add graph cpu.user right 75         \
-          #  --set cpu.user "${cpu_user[@]}"
+sketchybar  --add bracket cpu_bracket cpu \
+            --set cpu_bracket "${cpu_bracket[@]}"

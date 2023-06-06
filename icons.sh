@@ -50,10 +50,5 @@ MIC_ON=􀊱
 MIC_OFF=􀊲
 
 # Stats icons
-export CPU=􀫥
-export MEMORY=􀫦
-# export DISK=
-# export BATTERY=
-# export NETWORK=
-# export NETWORK_DOWN=
-# export NETWORK_UP=
+CPU=􀫥
+RAM=􀫦
