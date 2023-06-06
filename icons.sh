@@ -52,3 +52,7 @@ MIC_OFF=􀊲
 # Stats icons
 CPU=􀫥
 RAM=􀫦
+
+# WIFI
+WIFI_ON=􀙇
+WIFI_OFF=􀙈
