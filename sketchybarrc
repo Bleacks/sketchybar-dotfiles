@@ -71,16 +71,31 @@ source "$ITEM_DIR/apple.sh"
 # Center
 source "$ITEM_DIR/spotify.sh"
 
+
+spacer=(
+  label.drawing=off
+  icon=""
+)
+
+
 # Right
 source "$ITEM_DIR/calendar.sh"
+sketchybar --add item spacer-calendar right spacer-calendar --set spacer-calendar "${spacer[@]}"
 source "$ITEM_DIR/brew.sh"
+sketchybar --add item spacer-brew right spacer-brew --set spacer-brew "${spacer[@]}"
 # source "$ITEM_DIR/github.sh"
 source "$ITEM_DIR/battery.sh"
-source "$ITEM_DIR/mic.sh"
+sketchybar --add item spacer-battery right spacer-battery --set spacer-battery "${spacer[@]}"
 source "$ITEM_DIR/wifi.sh"
+sketchybar --add item spacer-wifi right spacer-wifi --set spacer-wifi "${spacer[@]}"
+source "$ITEM_DIR/mic.sh"
+sketchybar --add item spacer-mic right spacer-mic --set spacer-mic "${spacer[@]}"
 source "$ITEM_DIR/volume.sh"
+sketchybar --add item spacer-volume right spacer-volume --set spacer-volume "${spacer[@]}"
 source "$ITEM_DIR/cpu.sh"
+sketchybar --add item spacer-cpu right spacer-cpu --set spacer-cpu "${spacer[@]}"
 source "$ITEM_DIR/ram.sh"
+sketchybar --add item spacer-ram right spacer-ram --set spacer-ram "${spacer[@]}"
 
 #
 # </Base config from author's dotfiles>
