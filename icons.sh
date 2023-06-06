@@ -45,6 +45,10 @@ VOLUME_33=􀊥
 VOLUME_10=􀊡
 VOLUME_0=􀊣
 
+# Microphone Icons
+MIC_ON=􀊱
+MIC_OFF=􀊲
+
 # Stats icons
 export CPU=􀫥
 export MEMORY=􀫦
