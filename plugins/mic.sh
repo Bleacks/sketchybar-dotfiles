@@ -6,6 +6,7 @@ source "$CONFIG_DIR/colors.sh"
 MIC_VOLUME=$(osascript -e 'input volume of (get volume settings)')
 
 refresh_status() {
+  MIC_VOLUME=$(osascript -e 'input volume of (get volume settings)')
 
   if [ "$MIC_VOLUME" -eq 0 ]
   then
@@ -22,7 +23,6 @@ refresh_status() {
 }
 
 mouse_clicked() {
-
   if [ "$MIC_VOLUME" -eq 0 ]
   then
     osascript -e 'set volume input volume 100'
