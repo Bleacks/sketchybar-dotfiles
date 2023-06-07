@@ -1,21 +1,36 @@
 #!/bin/bash
 
 source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/icons.sh"
 
-COUNT=$(brew outdated | wc -l | tr -d ' ')
+refresh() {
 
-COLOR=$RED
+  COUNT=$(brew outdated | wc -l | tr -d ' ')
+  COLOR=$RED
 
-case "$COUNT" in
-  [3-5][0-9]) COLOR=$ORANGE
+  case "$COUNT" in
+    [3-5][0-9]) COLOR=$ORANGE
+    ;;
+    [1-2][0-9]) COLOR=$YELLOW
+    ;;
+    [1-9]) COLOR=$GREEN
+    ;;
+    0) COLOR=$BRACKET_DEFAULT_BORDER
+      COUNT="$CHECK_MARK"
+    ;;
+  esac
+
+  sketchybar  --set "$NAME" label="$COUNT" \
+              --set "${NAME}_bracket" background.border_color="$COLOR"
+}
+
+case "$SENDER" in
+  "mouse.clicked") refresh
   ;;
-  [1-2][0-9]) COLOR=$YELLOW
+  "forced") refresh
   ;;
-  [1-9]) COLOR=$WHITE
+  "routine") refresh
   ;;
-  0) COLOR=$GREEN
-     COUNT=􀆅
+  "brew_update") refresh
   ;;
 esac
-
-sketchybar --set $NAME label=$COUNT icon.color=$COLOR

@@ -8,6 +8,8 @@ ACTIVITY=􀒓
 LOCK=􀒳
 BELL=􀋚
 BELL_DOT=􀝗
+PACKAGE=􀐛
+CHECK_MARK=􀆅
 
 # Git Icons
 GIT_ISSUE=􀍷
