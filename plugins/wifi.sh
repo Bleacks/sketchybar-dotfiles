@@ -7,14 +7,14 @@ SSID="$(echo "$CURRENT_WIFI" | grep -o "SSID: .*" | sed 's/^SSID: //')"
 
 refresh() {
   if [ "$SSID" = "" ]; then
-    sketchybar --set $NAME label="" icon="$WIFI_OFF"
+    sketchybar --set "$NAME" label="" icon="$WIFI_OFF"
   else
-    sketchybar --set $NAME label="$SSID" icon="$WIFI_ON"
+    sketchybar --set "$NAME" label="$SSID" icon="$WIFI_ON"
   fi
 }
 
 mouse_clicked() {
-  IS_LABEL_DRAWED=$(sketchybar --query $NAME | jq -r ".label.drawing")
+  IS_LABEL_DRAWED=$(sketchybar --query "$NAME" | jq -r ".label.drawing")
 
   if [ "$IS_LABEL_DRAWED" = "off" ]
   then

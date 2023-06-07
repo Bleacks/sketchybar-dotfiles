@@ -21,8 +21,8 @@ refresh_status() {
     *) CPU_COLOR=$CPU_DEFAULT
   esac
 
-  sketchybar  --animate sin 20 --set cpu label="${CPU_USAGE}%" \
-              --set cpu_bracket background.border_color="$CPU_COLOR"
+  sketchybar  --animate sin 20 --set "$NAME" label="${CPU_USAGE}%" \
+              --set "${NAME}_bracket" background.border_color="$CPU_COLOR"
 }
 
 case "$SENDER" in

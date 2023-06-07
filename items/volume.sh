@@ -15,8 +15,8 @@ volume_slider=(
 
 volume_icon=(
   icon=$VOLUME_100
-  icon.padding_left=7
-  icon.padding_right=7
+  padding_left=7
+  padding_right=7
   label=""
 )
 

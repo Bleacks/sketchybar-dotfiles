@@ -4,6 +4,7 @@ mic=(
   padding_left=7
   padding_right=7
   label.padding_left=3
+  label=" - "
   icon="$MIC_ON"
 )
 

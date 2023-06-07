@@ -17,9 +17,9 @@ refresh_status() {
     BORDER_COLOR="$MIC_ON_BORDER"
   fi
 
-  sketchybar  --set mic icon="$ICON" \
-              --animate sin 20 --set mic label="${MIC_VOLUME}%" \
-              --set mic_bracket background.border_color="$BORDER_COLOR"
+  sketchybar  --set "$NAME" icon="$ICON" \
+              --animate sin 20 --set "$NAME" label="${MIC_VOLUME}%" \
+              --set "${NAME}_bracket" background.border_color="$BORDER_COLOR"
 }
 
 mouse_clicked() {

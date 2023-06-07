@@ -5,17 +5,17 @@ battery=(
   icon.font="$FONT:Regular:19.0"
   padding_right=7
   padding_left=7
-  label=" - "
+  label=""
   label.drawing=on
   label.padding_left=3
-  icon="$BATTERY_100"
+  icon="$BATTERY_0"
   update_freq=120
   updates=on
 )
 
 battery_bracket=(
   background.color="$BATTERY_BACKGROUND"
-  background.border_color="$BATTERY_BORDER_100"
+  background.border_color="$BRACKET_DEFAULT_BORDER"
   background.border_width=2
   background.padding_right=5
 )

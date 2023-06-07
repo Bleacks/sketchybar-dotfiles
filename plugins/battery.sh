@@ -30,20 +30,20 @@ refresh() {
     ICON=$BATTERY_CHARGING
   fi
 
-  sketchybar  --set $NAME icon="$ICON" \
-              --set battery_bracket background.border_color="$COLOR"
+  sketchybar  --set "$NAME" icon="$ICON" \
+              --set "${NAME}_bracket" background.border_color="$COLOR"
 }
 
 mouse_clicked() {
-  LABEL=$(sketchybar --query $NAME | jq -r ".label.value")
+  LABEL=$(sketchybar --query "$NAME" | jq -r ".label.value")
   if [[ "$LABEL" == *% ]]
   then
-    sketchybar --animate sin 20 --set $NAME label="$REMAINING"
+    sketchybar --animate sin 20 --set "$NAME" label="$REMAINING"
   elif [[ "$LABEL" == *:* ]]
   then
-    sketchybar --animate sin 20 --set $NAME label=""
+    sketchybar --animate sin 20 --set "$NAME" label=""
   else
-    sketchybar --animate sin 20 --set $NAME label="${PERCENTAGE}%"
+    sketchybar --animate sin 20 --set "$NAME" label="${PERCENTAGE}%"
   fi
   refresh
 }
