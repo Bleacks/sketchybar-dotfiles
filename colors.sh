@@ -13,7 +13,7 @@ export GREY=0xff939ab7
 export TRANSPARENT=0x00000000
 
 # General bar colors
-export BAR_COLOR=0xff1e1e2e
+export BAR_COLOR=$TRANSPARENT
 export BAR_BORDER_COLOR=#ffd180ff #0xa024273a
 export ICON_COLOR=$WHITE # Color of all icons
 export LABEL_COLOR=$WHITE # Color of all labels
@@ -31,9 +31,9 @@ export SHADOW_COLOR=$BLACK
 
 # Neon Tokyo theme
 # export FOCUSED=#ffd180ff
-export SPACE_BORDER_DEFAULT=0xffeed49f
+export SPACE_BORDER_DEFAULT=0x4444ffff
 export SPACE_BORDER_FULLSCREEN=0xbbffffff
-export SPACE_BORDER_FOCUSED=0x4444ffff
+export SPACE_BORDER_FOCUSED=0xffeed49f
 export SPACE_BACKGROUD_DEFAULT=$TRANSPARENT
 export SPACE_BACKGROUND_FULLSCREEN=$GREY
 export SPACE_HIGHLIGHT_COLOR=0x22000000

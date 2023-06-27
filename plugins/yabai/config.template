@@ -4,3 +4,5 @@ export YABAI_IGNORED_TITLE_REGEX="Quick Access — 1Password|Slack .*"
 
 export SPACE_PREFIX="yabai-space"   # Prefix for all item created in relation with spaces
 export WINDOW_PREFIX="yabai-window" # Prefix for all item created in relation with windows
+export YABAI_END="yabai-end"
+export YABAI_START="yabai-start"

@@ -6,16 +6,60 @@ source "$CONFIG_DIR/plugins/yabai/utility.sh"
 # Listener functions
 #
 
+get_display_index_from_id() {
+  DISPLAY_ID="$1"
+
+  DISPLAY_INDEX=$(yabai -m query --displays --display "$DISPLAY_INDEX" | jq '.index')
+
+  echo "$DISPLAY_INDEX"
+}
+
+refresh_display() {
+  source "$CONFIG_DIR/plugins/yabai/utility.sh"
+
+  DISPLAY_ID="$1"
+  DISPLAY_INDEX=$(get_display_index_from_id "$DISPLAY_INDEX")
+
+  sleep 5
+
+  refresh_spaces_on_display "$DISPLAY_INDEX"
+
+  refresh_bar
+}
+
+display_changed() {
+  source "$CONFIG_DIR/plugins/yabai/utility.sh"
+
+  RECENT_DISPLAY_ID="$1"
+  RECENT_DISPLAY_INDEX=$(get_display_index_from_id "$RECENT_DISPLAY_ID")
+  CURRENT_DISPLAY_ID="$2"
+  CURRENT_DISPLAY_INDEX=$(get_display_index_from_id "$CURRENT_DISPLAY_ID")
+
+  # TODO: Implement something more efficient
+  refresh_spaces_on_display "$RECENT_DISPLAY_INDEX"
+  refresh_spaces_on_display "$CURRENT_DISPLAY_INDEX"
+  
+  # RECENT_SPACE_INDEX=$(yabai -m query --spaces --display "$RECENT_DISPLAY_INDEX" | jq '.[] | select(.["has-focus"]) | .index')
+  # CURRENT_SPACE_INDEX=$(yabai -m query --spaces --display "$CURRENT_DISPLAY_INDEX" | jq '.[] | select(.["has-focus"]) | .index')
+
+  # space_changed "$CURRENT_SPACE_INDEX" "$RECENT_SPACE_INDEX"
+}
+
 space_changed() {
   source "$CONFIG_DIR/plugins/yabai/utility.sh"
   CURRENT_SPACE_ID="$1"
   RECENT_SPACE_ID="$2"
-  
+
   CURRENT_SPACE_INDEX=$(get_space_index_from_id "$CURRENT_SPACE_ID")
   RECENT_SPACE_INDEX=$(get_space_index_from_id "$RECENT_SPACE_ID")
 
-  # refresh_space "$CURRENT_SPACE_INDEX" &
-  refresh_space "$RECENT_SPACE_INDEX" &
+  if [ "$RECENT_SPACE_INDEX" = "" ]
+  then
+    refresh_bar
+  else
+    refresh_space "$CURRENT_SPACE_INDEX" &
+    refresh_space "$RECENT_SPACE_INDEX" &
+  fi
 }
 
 application_launched() {
@@ -38,7 +82,9 @@ window_state_changed() {
   refresh_space "$SPACE_INDEX"
 }
 
-# echo '  >>>> SENDER' $SENDER "$YABAI_PROCESS_ID" "$YABAI_RECENT_PROCESS_ID" "$YABAI_WINDOW_ID" "$YABAI_SPACE_ID" "$YABAI_DISPLAY_ID" "$YABAI_RECENT_SPACE_ID" "$YABAI_RECENT_DISPLAY_ID" "$SPACE_INDEX" "$WINDOW_ID" "$DISPLAY_ID"
+# Use window_focused to detect actions and diff between current and recent yabai window
+
+echo '  >>>> SENDER' $(date) $SENDER "$YABAI_PROCESS_ID" "$YABAI_RECENT_PROCESS_ID" "$YABAI_WINDOW_ID" "$YABAI_SPACE_ID" "$YABAI_DISPLAY_ID" "$YABAI_RECENT_SPACE_ID" "$YABAI_RECENT_DISPLAY_ID" "$SPACE_INDEX" "$WINDOW_ID" "$DISPLAY_ID"
 # TODO: Resourcess optimization - Implement a queue to send refresh udpates to, processing messages with a minor arbitrary delay to remove duplicate request from overlapping yabai signal
 # TODO: Delete unused signal and trigger from yabairc and items/yabai.sh
 case "$SENDER" in
@@ -63,8 +109,8 @@ case "$SENDER" in
   # "window_focused") refresh_window "$YABAI_WINDOW_ID"
   "window_focused") window_state_changed "$YABAI_WINDOW_ID"
   ;;
-  # "window_moved") window_moved
-  # ;;
+  "window_moved") refresh_window "$YABAI_WINDOW_ID"
+  ;;
   # "window_resized") window_resized
   # ;;
   "window_minimized") window_state_changed "$YABAI_WINDOW_ID"
@@ -75,16 +121,16 @@ case "$SENDER" in
   # ;;
   "space_changed") space_changed "$YABAI_SPACE_ID" "$YABAI_RECENT_SPACE_ID"
   ;;
-  # "display_added") display_added
-  # ;;
-  # "display_removed") display_removed
-  # ;;
+  "display_added") refresh_display "$YABAI_DISPLAY_ID"
+  ;;
+  "display_removed") refresh_display "$YABAI_DISPLAY_ID"
+  ;;
   # "display_moved") display_moved
   # ;;
   # "display_resized") display_resized
   # ;;
-  # "display_changed") display_changed
-  # ;;
+  "display_changed") display_changed "$YABAI_DISPLAY_ID" "$YABAI_RECENT_DISPLAY_ID"
+  ;;
   # "mouse.clicked") mouse_clicked
   # ;;
   "refresh_space") refresh_space "$SPACE_INDEX"

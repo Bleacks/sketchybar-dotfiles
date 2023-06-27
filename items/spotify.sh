@@ -9,7 +9,8 @@ spotify_anchor=(
   popup.horizontal=on
   popup.align=center
   popup.height=150
-  icon=􁁒
+  icon=󰓇
+  icon.color=$GREEN
   icon.font="$FONT:Regular:25.0"
   label.drawing=off
   drawing=off
@@ -56,12 +57,14 @@ spotify_album=(
 spotify_state=(
   icon.drawing=on
   icon.font="$FONT:Light Italic:10.0"
-  icon.width=35
+  icon.padding_right=7
+  # icon.width=35
   icon="00:00"
   label.drawing=on
   label.font="$FONT:Light Italic:10.0"
-  label.width=35
+  # label.width=35
   label="00:00"
+  label.padding_left=7
   padding_left=0
   padding_right=0
   y_offset=-15
@@ -71,7 +74,7 @@ spotify_state=(
   slider.background.color=$GREY
   slider.highlight_color=$GREEN
   slider.percentage=40
-  slider.width=115
+  slider.width=85
   script="$PLUGIN_DIR/spotify.sh"
   update_freq=1
   updates=when_shown
@@ -145,7 +148,7 @@ spotify_controls=(
 )
 
 sketchybar --add event spotify_change $SPOTIFY_EVENT             \
-           --add item spotify.anchor center                      \
+           --add item spotify.anchor right                       \
            --set spotify.anchor "${spotify_anchor[@]}"           \
            --subscribe spotify.anchor mouse.entered mouse.exited \
                                       mouse.exited.global        \

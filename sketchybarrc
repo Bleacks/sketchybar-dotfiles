@@ -69,16 +69,15 @@ source "$ITEM_DIR/apple.sh"
 # source "$ITEM_DIR/spaces.sh"
 
 # Center
-source "$ITEM_DIR/spotify.sh"
 
 
+# Right
 spacer=(
   label.drawing=off
   icon=""
 )
 
 
-# Right
 source "$ITEM_DIR/calendar.sh"
 sketchybar --add item spacer-calendar right spacer-calendar --set spacer-calendar "${spacer[@]}"
 source "$ITEM_DIR/brew.sh"
@@ -96,6 +95,8 @@ source "$ITEM_DIR/cpu.sh"
 sketchybar --add item spacer-cpu right spacer-cpu --set spacer-cpu "${spacer[@]}"
 source "$ITEM_DIR/ram.sh"
 sketchybar --add item spacer-ram right spacer-ram --set spacer-ram "${spacer[@]}"
+source "$ITEM_DIR/spotify.sh"
+sketchybar --add item spacer-spotify right spacer-spotify --set spacer-spotify "${spacer[@]}"
 
 #
 # </Base config from author's dotfiles>
@@ -106,22 +107,22 @@ sketchybar --add item spacer-ram right spacer-ram --set spacer-ram "${spacer[@]}
 # <Dynamic Island>
 #
 
-DYNAMIC_ISLAND_DIR="$HOME/.config/sketchybar/plugins/Dynamic-Island-Sketchybar"
+# DYNAMIC_ISLAND_DIR="$HOME/.config/sketchybar/plugins/Dynamic-Island-Sketchybar"
 
-# Define Dynamic island custom configs here
-source "$DYNAMIC_ISLAND_DIR/config.sh" # Loads Dynamic-Island config
+# # Define Dynamic island custom configs here
+# source "$DYNAMIC_ISLAND_DIR/config.sh" # Loads Dynamic-Island config
 
-# run helper program
-ISLANDHELPER=git.crissnb.islandhelper
-killall islandhelper
-cd $DYNAMIC_ISLAND_DIR/helper && make
-$DYNAMIC_ISLAND_DIR/helper/islandhelper $ISLANDHELPER &
+# # run helper program
+# ISLANDHELPER=git.crissnb.islandhelper
+# killall islandhelper
+# cd $DYNAMIC_ISLAND_DIR/helper && make
+# $DYNAMIC_ISLAND_DIR/helper/islandhelper $ISLANDHELPER &
 
-# Set up your own custom sketchybar config here
+# # Set up your own custom sketchybar config here
 
-###############################################
+# ###############################################
 
-source "$DYNAMIC_ISLAND_DIR/item.sh" # Loads Dynamic-Island item
+# source "$DYNAMIC_ISLAND_DIR/item.sh" # Loads Dynamic-Island item
 
 #
 # </Dynamic Island>

@@ -21,6 +21,4 @@ sketchybar  --add bracket mic_bracket mic \
             --set mic_bracket "${mic_bracket[@]}"
 
 sketchybar  --set mic script="$CONFIG_DIR/plugins/mic.sh" \
-            --subscribe mic mouse.clicked \
-            --set mic_bracket script="$CONFIG_DIR/plugins/mic.sh" \
-            --subscribe mic_bracket mouse.clicked
+            --subscribe mic mouse.clicked

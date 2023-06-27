@@ -3,6 +3,9 @@ source "$CONFIG_DIR/colors.sh"
 space_icon_base=(
   label.padding_right=5
   label.padding_left=7
+  label.highlight_color=$WHITE
+  label.font="$FONT:Bold:14.0"
+  y_offset=-0.5
 )
 
 space_bracket=(

@@ -30,6 +30,17 @@ refresh() {
     ICON=$BATTERY_CHARGING
   fi
 
+  LABEL=$(sketchybar --query "$NAME" | jq -r ".label.value")
+  if [[ "$LABEL" == *% ]]
+  then
+    sketchybar --animate sin 20 --set "$NAME" label="${PERCENTAGE}%"
+  elif [[ "$LABEL" == *:* ]]
+  then
+    sketchybar --animate sin 20 --set "$NAME" label="$REMAINING"
+  else
+    sketchybar --animate sin 20 --set "$NAME" label=""
+  fi
+
   sketchybar  --set "$NAME" icon="$ICON" \
               --set "${NAME}_bracket" background.border_color="$COLOR"
 }
